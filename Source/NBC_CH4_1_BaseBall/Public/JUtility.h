@@ -54,10 +54,8 @@ UE_LOG(LogTemp, Error, TEXT(Format), ##__VA_ARGS__); \
 
 #define JServerLog(Format, ...) \
 {\
-    FString TimeStamp = FString::Printf(TEXT("[%hs]: "), *(FDateTime::Now().ToString(TEXT("[%H:%M:%S]")))); \
-    FString MethodName = FString::Printf(TEXT("[%hs]: "), __FUNCTION__); \
     FString FormatString = FString::Printf(TEXT(Format), ##__VA_ARGS__); \
-    UE_LOG(LogServer, Log, TEXT("[%s]: %s %s"), *TimeStamp, *MethodName, *FormatString); \
+    UE_LOG(LogServer, Log, TEXT("%s"), *FormatString); \
     if(GEngine) \
     { \
         GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::White, *FormatString); \
@@ -66,10 +64,8 @@ UE_LOG(LogTemp, Error, TEXT(Format), ##__VA_ARGS__); \
 
 #define JClientLog(Format, ...) \
 {\
-    FString TimeStamp = FString::Printf(TEXT("[%s]: "), *(FDateTime::Now().ToString(TEXT("[%H:%M:%S]")))); \
-    FString MethodName = FString::Printf(TEXT("[%hs]: "), __FUNCTION__); \
     FString FormatString = FString::Printf(TEXT(Format), ##__VA_ARGS__); \
-    UE_LOG(LogClient, Log, TEXT("[%s]: %s %s"), *TimeStamp, *MethodName, *FormatString); \
+    UE_LOG(LogClient, Log, TEXT("%s"), *FormatString); \
     if(GEngine) \
     { \
         GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::White, *FormatString); \
