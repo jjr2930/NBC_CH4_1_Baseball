@@ -1,6 +1,8 @@
 #include "BBGameMode.h"
 
+#include "BBGameState.h"
 #include "BBPlayerController.h"
+#include "BBPlayerState.h"
 #include "BBWidget.h"
 #include "GlobalConst.h"
 #include "JUtility.h"
@@ -24,10 +26,56 @@ void ABBGameMode::OnPostLogin(AController* NewPlayer)
 	
 	int32 PlayerControllerCount = UGameplayStatics::GetNumPlayerControllers(GetWorld());
 	
-
-	BBPlayerController->SetPlayerName(FString::Printf(TEXT("Player_%d"), PlayerControllerCount));
+	ABBPlayerState* BBPlayerState = BBPlayerController->GetPlayerState<ABBPlayerState>();
+	JASSERT(BBPlayerState != nullptr, "BBPlayerState is not valid!");
+	
+	BBPlayerState->SetPlayerName(FString::Printf(TEXT("Player_%d"), PlayerControllerCount));
 	
 	JServerLog("Player %d has joined the game.", PlayerControllerCount);
+}
+
+void ABBGameMode::OnChatCommitted(const FString& InputString, AController* PlayerController)
+{
+	//it must be run at release build so not use JASSERT;
+	if (InputString.IsEmpty())
+	{
+		JServerLog("InputString is empty.");
+		return;
+	}
+	
+	FString TrimedInput = InputString.TrimStartAndEnd();
+	bool bIsAnswerInput = TrimedInput.IsNumeric() && TrimedInput.Len() == GlobalConst::ANSWER_LENGTH;
+	if (bIsAnswerInput)
+	{
+		ABBPlayerState* PlayerState = PlayerController->GetPlayerState<ABBPlayerState>();
+		JASSERT(IsValid(PlayerState), "PlayerState is not valid!");
+		
+		TempPlayerAnswer.Empty();
+		for (TCHAR ch : TrimedInput)
+		{
+			int32 Digit = ch - '0';
+			TempPlayerAnswer.Add(Digit);
+		}
+		
+		FJudgeAnswerResult JudgeResult = JudgeAnswer(TempPlayerAnswer);
+		if (JudgeResult.StrikeCount == 0 && JudgeResult.BallCount == 0)
+		{
+			GameState->MultiCast_AddChatMessage(FString::Printf(TEXT("%s: %s -> Out!"), *PlayerState->GetPlayerName(), *TrimedInput));
+		}
+		
+		PlayerState->DecreaseRemainGuessCount();
+	}
+	else
+	{
+		ABBPlayerState* PlayerState = PlayerController->GetPlayerState<ABBPlayerState>();
+		JASSERT(IsValid(PlayerState), "PlayerState is not valid!");
+		
+		FString ChatMessage = FString::Printf(TEXT("%s: %s"), *PlayerState->GetPlayerName(), *TrimedInput);
+		ABBGameState* BBGameState = GetWorld()->GetGameState<ABBGameState>();
+		JASSERT(BBGameState != nullptr, "BBGameState is not valid!");
+		
+		BBGameState->MultiCast_AddChatMessage(ChatMessage);		
+	}
 }
 
 void ABBGameMode::GenerateRandomNumbers()

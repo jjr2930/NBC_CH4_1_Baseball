@@ -22,6 +22,8 @@ public:
 	virtual void BeginPlay() override;
 	virtual void OnPostLogin(AController* NewPlayer) override;
 	
+	void OnChatCommitted(const FString& InputString, AController* PlayerController);
+	
 protected:
 	void GenerateRandomNumbers();
 	FJudgeAnswerResult JudgeAnswer(TArray<int32>& PlayerAnswer);	
@@ -29,4 +31,5 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "===Baseball===|Properties");
 	TArray<int32> Answer;
 	
+	TArray<int32> TempPlayerAnswer;
 };

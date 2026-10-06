@@ -18,6 +18,4 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiCast_AddChatMessage(const FString& NewMessage);
 	
-protected:
-	FString LastMessageReceived;
 };
