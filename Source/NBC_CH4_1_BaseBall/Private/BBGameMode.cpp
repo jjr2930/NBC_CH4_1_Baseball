@@ -10,6 +10,12 @@
 #include "GameFramework/PlayerState.h"
 #include "Kismet/GameplayStatics.h"
 
+FJudgeAnswerResult::FJudgeAnswerResult()
+	:StrikeCount(0)
+	, BallCount(0)
+{
+}
+
 void ABBGameMode::BeginPlay()
 {
 	Super::BeginPlay();
@@ -29,7 +35,7 @@ void ABBGameMode::OnPostLogin(AController* NewPlayer)
 	ABBPlayerState* BBPlayerState = BBPlayerController->GetPlayerState<ABBPlayerState>();
 	JASSERT(BBPlayerState != nullptr, "BBPlayerState is not valid!");
 	
-	BBPlayerState->SetPlayerName(FString::Printf(TEXT("Player_%d"), PlayerControllerCount));
+	BBPlayerState->SetIngameName(FString::Printf(TEXT("Player_%d"), PlayerControllerCount));
 	
 	JServerLog("Player %d has joined the game.", PlayerControllerCount);
 }
@@ -50,6 +56,8 @@ void ABBGameMode::OnChatCommitted(const FString& InputString, AController* Playe
 		ABBPlayerState* PlayerState = PlayerController->GetPlayerState<ABBPlayerState>();
 		JASSERT(IsValid(PlayerState), "PlayerState is not valid!");
 		
+		PlayerState->DecreaseRemainGuessCount();
+		
 		TempPlayerAnswer.Empty();
 		for (TCHAR ch : TrimedInput)
 		{
@@ -57,13 +65,23 @@ void ABBGameMode::OnChatCommitted(const FString& InputString, AController* Playe
 			TempPlayerAnswer.Add(Digit);
 		}
 		
-		FJudgeAnswerResult JudgeResult = JudgeAnswer(TempPlayerAnswer);
+		FJudgeAnswerResult JudgeResult = JudgeAnswer(TempPlayerAnswer);		
+		ABBGameState* CastedGameState = GetGameState<ABBGameState>();
+		JASSERT(CastedGameState != nullptr, "GameState is not valid!");
+		
+		FString JudgeMessage;
 		if (JudgeResult.StrikeCount == 0 && JudgeResult.BallCount == 0)
 		{
-			GameState->MultiCast_AddChatMessage(FString::Printf(TEXT("%s: %s -> Out!"), *PlayerState->GetPlayerName(), *TrimedInput));
+			JServerLog("%s Out", *PlayerState->GetPlayerName());
 		}
-		
-		PlayerState->DecreaseRemainGuessCount();
+		else
+		{
+			JServerLog("[%s]:[%s][%dS %dB]" 
+			    , *PlayerState->GetPlayerName()
+			    , *TrimedInput
+			    , JudgeResult.StrikeCount
+			    , JudgeResult.BallCount);
+		}
 	}
 	else
 	{
@@ -95,6 +113,14 @@ void ABBGameMode::GenerateRandomNumbers()
 			Answer.Add(RandomNumber);
 		}
 	}
+	
+	FString AnswerString;
+	for (int i = 0; i<GlobalConst::ANSWER_LENGTH; i++)
+	{
+		AnswerString += FString::FromInt(Answer[i]);
+	}
+	
+	JServerLog("Answer is %s", *AnswerString);
 }
 
 FJudgeAnswerResult ABBGameMode::JudgeAnswer(TArray<int32>& PlayerAnswer)

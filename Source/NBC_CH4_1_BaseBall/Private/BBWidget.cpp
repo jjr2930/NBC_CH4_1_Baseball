@@ -25,7 +25,7 @@ void UBBWidget::OnTextCommitted(const FText& Text, ETextCommit::Type CommitMetho
 				ABBPlayerController* BBPlayerController = Cast<ABBPlayerController>(GetOwningPlayer());
 				JASSERT(IsValid(BBPlayerController), "Owning player controller is not a BBPlayerController!");
 				
-				BBPlayerController->ServerRPC_OnTextCommitted(Text.ToString());				
+				BBPlayerController->ServerRpcOnChatCommitted(Text.ToString());				
 				break;
 			}
 		default:

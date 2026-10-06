@@ -9,6 +9,9 @@ class UBBWidget;
 class NBC_CH4_1_BASEBALL_API FJudgeAnswerResult 
 {
 public:
+	FJudgeAnswerResult();
+	
+public:
 	int32 StrikeCount;
 	int32 BallCount;
 };

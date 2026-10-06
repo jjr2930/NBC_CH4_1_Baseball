@@ -22,11 +22,12 @@ public:
 	void DecreaseRemainGuessCount();
 	int GetRemainGuessCount();
 	
+	void SetIngameName(const FString& NewName);
 	FString& GetPlayerName();
 protected:
 	UPROPERTY(Replicated);
 	int RemainGuessCount;
 	
 	UPROPERTY(Replicated)
-	FString PlayerName;
+	FString IngameName;
 };

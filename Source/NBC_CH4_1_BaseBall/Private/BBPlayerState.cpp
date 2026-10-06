@@ -16,7 +16,7 @@ void ABBPlayerState::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>&
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	
 	DOREPLIFETIME(ThisClass, RemainGuessCount);
-	DOREPLIFETIME(ThisClass, PlayerName);
+	DOREPLIFETIME(ThisClass, IngameName);
 }
 
 void ABBPlayerState::DecreaseRemainGuessCount()
@@ -29,7 +29,12 @@ int ABBPlayerState::GetRemainGuessCount()
 	return RemainGuessCount;
 }
 
+void ABBPlayerState::SetIngameName(const FString& NewName)
+{
+	this->IngameName= NewName;
+}
+
 FString& ABBPlayerState::GetPlayerName()
 {
-	return PlayerName;
+	return IngameName;
 }
