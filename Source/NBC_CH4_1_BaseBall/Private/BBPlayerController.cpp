@@ -27,12 +27,19 @@ void ABBPlayerController::BeginPlay()
 
 
 void ABBPlayerController::AddPrintChattingMessage(const FString& Message)
-{			
-	if (IsValid(IngameWidgetInstance))
-	{
-		IngameWidgetInstance->AddChatHistory(Message);
-	}
+{	
+	JASSERT(IsValid(IngameWidgetInstance), "IngameWidgetInstance is not valid!");
+	
+	IngameWidgetInstance->AddChatHistory(Message);
 }
+
+void ABBPlayerController::SetAnnounceMessage(const FString& NewAnnounceMessage)
+{
+	JASSERT( IsValid(IngameWidgetInstance), "IngameWidgetInstance is not valid!");
+
+	IngameWidgetInstance->SetAnnounceText(NewAnnounceMessage);
+}
+
 
 void ABBPlayerController::ServerRpcOnChatCommitted_Implementation(const FString& InputString)
 {

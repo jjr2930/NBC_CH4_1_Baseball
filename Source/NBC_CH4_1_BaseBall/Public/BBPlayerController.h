@@ -16,11 +16,11 @@ class NBC_CH4_1_BASEBALL_API ABBPlayerController : public APlayerController
 public:
 	virtual void BeginPlay() override;
 	
-	void AddPrintChattingMessage(const FString& Message);
-	
 	UFUNCTION(Server, Reliable)
 	void ServerRpcOnChatCommitted(const FString& InputString);
 	
+	void AddPrintChattingMessage(const FString& Message);
+	void SetAnnounceMessage(const FString& NewAnnounceMessage);
 protected:	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "===Baseball===|Properties");
 	TSubclassOf<UUserWidget> IngameWidgetClass;

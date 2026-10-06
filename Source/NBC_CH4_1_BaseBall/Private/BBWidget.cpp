@@ -14,6 +14,18 @@ void UBBWidget::NativeOnInitialized()
 	TextInput->OnTextCommitted.AddDynamic(this, &UBBWidget::OnTextCommitted);
 }
 
+void UBBWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
+{
+	Super::NativeTick(MyGeometry, InDeltaTime);
+	
+	float Now = GetWorld()->GetTimeSeconds();
+	
+	if (Now - LastAnnounceTime > AnnounceDisplayDuration)
+	{
+		SetAnnounceText(TEXT(""));
+	}
+}
+
 void UBBWidget::OnTextCommitted(const FText& Text, ETextCommit::Type CommitMethod)
 {
 	switch (CommitMethod)
@@ -40,4 +52,12 @@ void UBBWidget::AddChatHistory(const FString& NewMessage)
 	
 	FString NextText = ChatHistory->GetText().ToString() + LINE_TERMINATOR + NewMessage;
 	ChatHistory->SetText(FText::FromString(NextText));
+}
+
+void UBBWidget::SetAnnounceText(const FString& NewAnnounceText)
+{
+	JASSERT(IsValid(AnnounceText), "AnnounceText is not valid!");
+	AnnounceText->SetText(FText::FromString(NewAnnounceText));
+	
+	LastAnnounceTime = GetWorld()->GetTimeSeconds();
 }

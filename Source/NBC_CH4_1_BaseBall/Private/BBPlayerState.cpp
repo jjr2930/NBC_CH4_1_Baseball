@@ -7,8 +7,9 @@
 
 ABBPlayerState::ABBPlayerState()
 {
-	RemainGuessCount = GlobalConst::TOTAL_ANSWER_COUNT;
+	RemainGuessCount = GlobalConst::TOTAL_ANSWER_COUNT;	
 	
+	bReplicates = true;
 }
 
 void ABBPlayerState::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
