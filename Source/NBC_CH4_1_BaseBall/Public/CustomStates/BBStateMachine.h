@@ -16,7 +16,9 @@ public:
 	
 	virtual void BuildStateTransitionMap() override;
 	
-	bool CheckWaitToIngameTransition(UState* From, UState* To);	
-	
 	void OnPostLogin(AController* NewPlayer);
+	
+	bool CheckWaitToIngameTransition(UState* From, UState* To);	
+	bool CheckIngameToFinishedTransition(UState* From, UState* To);
+	bool CheckFinishedToIngameTransition(UState* From, UState* To);
 };

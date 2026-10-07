@@ -7,7 +7,7 @@
 
 ABBPlayerState::ABBPlayerState()
 {
-	RemainGuessCount = GlobalConst::TOTAL_ANSWER_COUNT;	
+	RemainGuessCount = GlobalConst::TOTAL_GUESS_COUNT;	
 	
 	bReplicates = true;
 }

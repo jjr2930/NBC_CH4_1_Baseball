@@ -26,6 +26,18 @@ bool FJudgeAnswerResult::IsZero()
 	return StrikeCount == 0 && BallCount == 0;
 }
 
+UIngameState::UIngameState()
+{
+	//PlayerName, InputNumber, StrikeCount, BallCount, RemainGuessCount, TotalGuessCount
+	AnswerResoponseFormat = TEXT("{0}:{1} [{2}S {3}B] [{4}/{5}]");
+	//PlayerName, Message
+	ChatMessageFormat = TEXT("{0}: {1}");
+	//PlayerName, Input Number, RemainGuessCount, TotalGuessCount
+	OutMessageFormat = TEXT("{0}: {1} OUT! [{2}/{3}]");
+	//PlayerName, Input Number
+	CorrectMessageFormat = TEXT("{0}: {1} Correct!");
+}
+
 void UIngameState::OnEnter()
 {
 	Super::OnEnter();
@@ -44,6 +56,7 @@ void UIngameState::OnEnter()
 	}
 	
 	OwnerGameMode->ResetCurrentTurnPlayer();
+	OwnerGameMode->SetRunningState(ABBGameMode::ERunningState::Playing);
 }
 
 void UIngameState::OnPlayerMessageCommitted(const FString& InputString, AController* Sender)
@@ -52,6 +65,8 @@ void UIngameState::OnPlayerMessageCommitted(const FString& InputString, AControl
 	
 	ABBPlayerController* CastedSender = Cast<ABBPlayerController>(Sender);
 	ABBPlayerController* CurrentTurnPlayer = GetCurrentTurnPlayer();
+	ABBGameState* BBGameState = GetWorld()->GetGameState<ABBGameState>();
+	JASSERT(BBGameState != nullptr, "BBGameState is not valid!");
 	
 	//it must be run at release build so not use JASSERT;
 	if (InputString.IsEmpty())
@@ -104,32 +119,42 @@ void UIngameState::OnPlayerMessageCommitted(const FString& InputString, AControl
 		FString JudgeMessage;
 		if (JudgeResult.IsZero())
 		{
-			FString Message = FString::Printf(TEXT("[%s]:[%s] OUT!")
-				, *PlayerState->GetPlayerName()
-				, *TrimedInput);
+			FString Message = FString::Format(*OutMessageFormat, 
+		{
+				PlayerState->GetPlayerName()
+				,TrimedInput
+				,PlayerState->GetRemainGuessCount()
+				,GlobalConst::TOTAL_GUESS_COUNT
+			});
 			
 			JServerLog("%s", *Message);
 			OwnerGameMode->BroadcastChatMessage(Message);
 		}
 		else if (JudgeResult.Is3Strike())
 		{
-			FString Message = FString::Printf(TEXT("%s:[%s] Correct! You win!")
-				, *PlayerState->GetPlayerName()
-				, *TrimedInput);
+			FString Message = FString::Format(*CorrectMessageFormat, 
+		{
+				PlayerState->GetPlayerName()
+				, TrimedInput
+			});
 			
 			JServerLog("%s", *Message);
 			OwnerGameMode->BroadcastChatMessage(Message);
 			
-			FString AnnounceMessage = FString::Printf(TEXT("System: [%s] has won the game!"), *PlayerState->GetPlayerName());
-			OwnerGameMode->BroadcastAnnounceMessage(AnnounceMessage);
+			OwnerGameMode->SetRunningState(ABBGameMode::ERunningState::SomeoneWin);
+			OwnerGameMode->SetWinner(CastedSender);
 		}
 		else
 		{
-			FString Message = FString::Printf(TEXT("%s:[%s][%dS %dB]")
-				, *PlayerState->GetPlayerName()
-				, *TrimedInput
-				, JudgeResult.StrikeCount
-				, JudgeResult.BallCount);
+			FString Message = FString::Format(*AnswerResoponseFormat, 
+		{
+				PlayerState->GetPlayerName()
+				,TrimedInput
+				,JudgeResult.StrikeCount
+				,JudgeResult.BallCount
+				,PlayerState->GetRemainGuessCount()
+				,GlobalConst::TOTAL_GUESS_COUNT
+			});
 			
 			JServerLog("%s", *Message);	
 			OwnerGameMode->BroadcastChatMessage(Message);
@@ -137,18 +162,43 @@ void UIngameState::OnPlayerMessageCommitted(const FString& InputString, AControl
 		
 		CurrentTurnPlayerIndex = (CurrentTurnPlayerIndex + 1) % OwnerGameMode->GetPlayerControllerCount();
 		OwnerGameMode->SetCurrentTurnPlayer(CurrentTurnPlayerIndex);
+		
+		if (IsEveryPlayerUsedAllGuessCount())
+		{
+			OwnerGameMode->SetRunningState(ABBGameMode::ERunningState::Draw);
+			
+			FString DrawMessage = FString::Printf(TEXT("System: The game is a draw!"));
+		
+			BBGameState->Multicast_SetAnnounceMessage(DrawMessage);
+		}
 	}
 	else
 	{
 		ABBPlayerState* PlayerState = Sender->GetPlayerState<ABBPlayerState>();
 		JASSERT(IsValid(PlayerState), "PlayerState is not valid!");
 		
-		FString ChatMessage = FString::Printf(TEXT("%s: %s"), *PlayerState->GetPlayerName(), *TrimedInput);
-		ABBGameState* BBGameState = GetWorld()->GetGameState<ABBGameState>();
-		JASSERT(BBGameState != nullptr, "BBGameState is not valid!");
+		FString ChatMessage = FString::Format(*ChatMessageFormat, 
+		{
+			PlayerState->GetPlayerName()
+			,TrimedInput
+		});
 		
 		BBGameState->MultiCast_AddChatMessage(ChatMessage);		
+	}	
+}
+
+bool UIngameState::IsEveryPlayerUsedAllGuessCount() const
+{
+	int32 ControllerCounut = OwnerGameMode->GetPlayerControllerCount();
+	for (int32 i = 0; i < ControllerCounut; i++)
+	{
+		ABBPlayerController* PlayerController = OwnerGameMode->GetPlayerControllerByIndex(i);
+		if (PlayerController->GetPlayerState<ABBPlayerState>()->GetRemainGuessCount() > 0)
+		{
+			return false;
+		}
 	}
+	return true;
 }
 
 FJudgeAnswerResult UIngameState::JudgeAnswer(TArray<int32>& PlayerAnswer)

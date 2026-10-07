@@ -5,6 +5,8 @@
 #include "BBGameMode.h"
 #include "GlobalConst.h"
 #include "JUtility.h"
+#include "CustomStates/FinishedState.h"
+
 
 void UBBStateMachine::BuildStateTransitionMap()
 {	
@@ -18,11 +20,25 @@ void UBBStateMachine::BuildStateTransitionMap()
 	IngameState->SetOwnerGameMode(GetOwner<ABBGameMode>());
 	IngameState->SetDisplayName(TEXT("IngameState"));
 	
+	UFinishedState* FinishedState = NewObject<UFinishedState>(this);
+	FinishedState->SetParentMachine(this);
+	FinishedState->SetOwnerGameMode(GetOwner<ABBGameMode>());
+	FinishedState->SetDisplayName(TEXT("FinishedState"));
+	
 	AddState(WaitPlayerState);
 	AddState(IngameState);
+	AddState(FinishedState);
 	AddTransition(WaitPlayerState
 		, FTransitionCheckingDelegate::CreateUObject(this, &UBBStateMachine::CheckWaitToIngameTransition)
 		, IngameState);
+	
+	AddTransition(IngameState
+		, FTransitionCheckingDelegate::CreateUObject(this, &UBBStateMachine::CheckIngameToFinishedTransition)
+		, FinishedState);
+	
+	AddTransition(FinishedState,
+		FTransitionCheckingDelegate::CreateUObject(this, &UBBStateMachine::CheckFinishedToIngameTransition),
+		IngameState);
 	
 	TransitionMap.Empty();
 	for (UTransition* Transition : Transitions)
@@ -48,6 +64,30 @@ bool UBBStateMachine::CheckWaitToIngameTransition(UState* From, UState* To)
 	{
 		return false;
 	}
+}
+
+bool UBBStateMachine::CheckIngameToFinishedTransition(UState* From, UState* To)
+{
+	ABBGameMode* GameMode = GetOwner<ABBGameMode>();
+	JASSERT_BOOL(IsValid(GameMode), "GameMode is not valid!");
+	
+	if (GameMode->GetRunningState() != ABBGameMode::ERunningState::Playing)
+	{
+		JServerLog("GameMode's running state is not Playing, transition to FinishedState.");
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+bool UBBStateMachine::CheckFinishedToIngameTransition(UState* From, UState* To)
+{
+	UFinishedState* FinishedState = NewObject<UFinishedState>(this);
+	JASSERT_BOOL(IsValid(FinishedState), "FinishedState is not valid!");
+	
+	return FinishedState->IsFinished();
 }
 
 void UBBStateMachine::OnPostLogin(AController* NewPlayer)

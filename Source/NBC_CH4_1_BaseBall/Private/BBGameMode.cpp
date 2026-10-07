@@ -101,3 +101,23 @@ void ABBGameMode::SetCurrentTurnPlayer(int32 index)
 	FString Message = TEXT("It's your turn to play!");
 	CurrentTurnPlayer->ClientRpcSetAnnounceMessage(Message);
 }
+
+void ABBGameMode::SetRunningState(ERunningState newState)
+{
+	GameState = newState;
+}
+
+ABBGameMode::ERunningState ABBGameMode::GetRunningState() const
+{
+	return GameState;
+}
+
+void ABBGameMode::SetWinner(ABBPlayerController* NewWinner)
+{
+	Winner = NewWinner;
+}
+
+ABBPlayerController* ABBGameMode::GetWinner() const
+{
+	return Winner;
+}

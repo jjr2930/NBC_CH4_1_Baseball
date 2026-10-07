@@ -12,6 +12,13 @@ UCLASS()
 class NBC_CH4_1_BASEBALL_API ABBGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
+public:
+	enum class ERunningState
+	{
+		Playing,
+		SomeoneWin,
+		Draw
+	};
 	
 public:
 	ABBGameMode();
@@ -32,6 +39,12 @@ public:
 		
 	void ResetCurrentTurnPlayer();
 	void SetCurrentTurnPlayer(int32 index);
+	
+	void SetRunningState(ERunningState newState);
+	ERunningState GetRunningState() const;
+	
+	void SetWinner(ABBPlayerController* NewWinner);
+	ABBPlayerController* GetWinner() const;
 protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "===Baseball===|Properties")
@@ -40,7 +53,7 @@ protected:
 	TArray<int32> TempPlayerAnswer;
 		
 	///////////////////////////////////////
-	/// START NO UPROPERTY 
+	/// START NOT DISPLAYED IN DEATILED PANEL
 	///////////////////////////////////////
 protected:
 	UPROPERTY()
@@ -51,4 +64,7 @@ protected:
 	
 	UPROPERTY()
 	TObjectPtr<UBBStateMachine> StateMachine;
+	
+	ERunningState GameState;
+	ABBPlayerController* Winner;
 };
