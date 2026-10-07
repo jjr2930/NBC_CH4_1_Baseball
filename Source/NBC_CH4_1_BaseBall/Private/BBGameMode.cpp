@@ -27,8 +27,7 @@ void ABBGameMode::OnPostLogin(AController* NewPlayer)
 {
 	Super::OnPostLogin(NewPlayer);
 	
-	UBBStateBase* CurrentState = StateMachine->GetCurrentState<UBBStateBase>();
-	CurrentState->PostLogin(NewPlayer);
+	StateMachine->OnPostLogin(NewPlayer);
 }
 
 void ABBGameMode::Tick(float DeltaSeconds)
@@ -76,4 +75,29 @@ void ABBGameMode::AddPlayerController(ABBPlayerController* NewPlayerController)
 int32 ABBGameMode::GetPlayerControllerCount() const
 {
 	return PlayerControllers.Num();
+}
+
+ABBPlayerController* ABBGameMode::GetPlayerControllerByIndex(int32 index) const
+{
+	//checking out of ragne
+	JASSERT_NULLPTR ((0 <= index) && (index < PlayerControllers.Num()), "Index is out of range!");
+	
+	return PlayerControllers[index];
+}
+
+void ABBGameMode::ResetCurrentTurnPlayer()
+{
+	JASSERT(PlayerControllers.Num() > 0, "PlayerControllers is empty!");
+	
+	SetCurrentTurnPlayer(0);
+}
+
+void ABBGameMode::SetCurrentTurnPlayer(int32 index)
+{
+	JASSERT((0 <= index) && (index < PlayerControllers.Num()), "Index is out of range!");
+	
+	CurrentTurnPlayer = PlayerControllers[index];
+	
+	FString Message = TEXT("It's your turn to play!");
+	CurrentTurnPlayer->ClientRpcSetAnnounceMessage(Message);
 }

@@ -10,6 +10,10 @@ void UBBStateBase::SetOwnerGameMode(ABBGameMode* InOwnerGameMode)
 	OwnerGameMode = InOwnerGameMode;
 }
 
+void UBBStateBase::OnPostLogin(AController* NewPlayer)
+{
+}
+
 void UBBStateBase::SendChatMessage(const FString& NewMessage)
 {
 	OwnerGameMode->BroadcastChatMessage(NewMessage);
@@ -18,10 +22,6 @@ void UBBStateBase::SendChatMessage(const FString& NewMessage)
 void UBBStateBase::SendAnnounceMessage(const FString& NewAnnounceMessage)
 {
 	OwnerGameMode->BroadcastAnnounceMessage(NewAnnounceMessage);
-}
-
-void UBBStateBase::PostLogin(AController* NewPlayer)
-{	
 }
 
 void UBBStateBase::OnPlayerMessageCommitted(const FString& InputString, AController* Sender)

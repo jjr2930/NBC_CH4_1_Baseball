@@ -46,7 +46,9 @@ protected:
     UPROPERTY()
     TArray<TObjectPtr<UState>> States;
     
-    //TODO: Multimap not supported UPROPERTY!!! WTF
+    UPROPERTY()
+    TArray<TObjectPtr<UTransition>> Transitions;
+    
     TMultiMap<TObjectPtr<UState>, TObjectPtr<UTransition>> TransitionMap;
     
     UPROPERTY()

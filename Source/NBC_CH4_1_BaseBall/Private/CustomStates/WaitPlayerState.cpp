@@ -6,6 +6,7 @@
 #include "BBGameMode.h"
 #include "BBPlayerController.h"
 #include "BBPlayerState.h"
+#include "GlobalConst.h"
 #include "JUtility.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -16,10 +17,10 @@ void UWaitPlayerState::OnEnter()
 	JServerLog("UWaitPlayerState::OnEnter");
 }
 
-void UWaitPlayerState::PostLogin(AController* NewPlayer)
+void UWaitPlayerState::OnPostLogin(AController* NewPlayer)
 {
-	Super::PostLogin(NewPlayer);
-	
+	Super::OnPostLogin(NewPlayer);
+
 	ABBPlayerController* BBPlayerController = Cast<ABBPlayerController>(NewPlayer);
 	JASSERT(BBPlayerController != nullptr, "NewPlayer is not a BBPlayerController!");
 	
@@ -31,10 +32,18 @@ void UWaitPlayerState::PostLogin(AController* NewPlayer)
 	BBPlayerState->SetIngameName(FString::Printf(TEXT("Player_%d"), PlayerControllerCount));
 	OwnerGameMode->AddPlayerController(BBPlayerController);
 	
-	OwnerGameMode->BroadcastAnnounceMessage(FString::Printf(TEXT("Player %s has joined the game!"), *BBPlayerState->GetPlayerName()));
+	FString Message = FString::Printf(TEXT("Player %s has joined the game!")
+		, *BBPlayerController->GetPlayerState<ABBPlayerState>()->GetPlayerName());
+		
+	OwnerGameMode->BroadcastAnnounceMessage(Message);
 }
 
 void UWaitPlayerState::OnPlayerMessageCommitted(const FString& InputString, AController* Sender)
 {
 	Super::OnPlayerMessageCommitted(InputString, Sender);
+}
+
+bool UWaitPlayerState::IsPlayerQueueEmpty() const
+{
+	return NewPlayerQueue.IsEmpty();
 }

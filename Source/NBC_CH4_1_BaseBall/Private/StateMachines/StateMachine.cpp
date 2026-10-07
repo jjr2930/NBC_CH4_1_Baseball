@@ -26,7 +26,7 @@ void UStateMachine::OnTick(float DeltaSeconds)
 
     for (UTransition* Transition : FoundMulti)
     {
-        if (Transition->CanTranstition())
+        if (Transition->CanTransition())
         {
             ChangeState(Transition->GetToState());
             break;
@@ -49,7 +49,8 @@ void UStateMachine::AddState(TObjectPtr<UState> InNewState)
 void UStateMachine::AddTransition(TObjectPtr< UState> InFromState, FTransitionCheckingDelegate InTranstitionCallback, TObjectPtr<UState> InToState)
 {
     TObjectPtr<UTransition> NewTransition = UTransition::Create(this, InFromState, InToState, InTranstitionCallback);
-    TransitionMap.Emplace(InFromState, NewTransition);
+    
+    Transitions.Emplace(NewTransition);
 }
 
 void UStateMachine::SetOwner(AActor* InOwner)

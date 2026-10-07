@@ -18,7 +18,7 @@ public:
         , TObjectPtr<UState> To
         , FTransitionCheckingDelegate Delegate);
 
-    bool CanTranstition();
+    bool CanTransition();
     TObjectPtr<UState> GetFromState();
     TObjectPtr<UState> GetToState();
 

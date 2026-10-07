@@ -14,10 +14,15 @@ class NBC_CH4_1_BASEBALL_API ABBPlayerController : public APlayerController
 {
 	GENERATED_BODY()
 public:
+	ABBPlayerController();
+	
 	virtual void BeginPlay() override;
 	
 	UFUNCTION(Server, Reliable)
 	void ServerRpcOnChatCommitted(const FString& InputString);
+	
+	UFUNCTION(Client, Reliable)
+	void ClientRpcSetAnnounceMessage(const FString& NewAnnounceMessage);
 	
 	void AddPrintChattingMessage(const FString& Message);
 	void SetAnnounceMessage(const FString& NewAnnounceMessage);
@@ -30,4 +35,6 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "===Baseball===|Properties");	
 	FString PlayerName;
+	
+	bool bIsInit;
 };

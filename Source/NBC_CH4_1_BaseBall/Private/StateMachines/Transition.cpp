@@ -26,7 +26,7 @@ TObjectPtr<UTransition> UTransition::Create(
     return NewTransition;
 }
 
-bool UTransition::CanTranstition()
+bool UTransition::CanTransition()
 {
     return TransitionCallback.Execute(From, To);
 }

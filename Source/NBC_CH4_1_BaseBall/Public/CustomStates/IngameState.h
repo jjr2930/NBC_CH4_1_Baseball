@@ -9,7 +9,8 @@ class NBC_CH4_1_BASEBALL_API FJudgeAnswerResult
 {
 public:
 	FJudgeAnswerResult();
-	
+	bool Is3Strike();
+	bool IsZero();
 public:
 	int32 StrikeCount;
 	int32 BallCount;
@@ -21,13 +22,16 @@ class NBC_CH4_1_BASEBALL_API UIngameState : public UBBStateBase
 	GENERATED_BODY()
 	
 public:
+	virtual void OnEnter() override;
 	virtual void OnPlayerMessageCommitted(const FString& InputString, AController* Sender) override;
 	
-	virtual void OnEnter() override;
 protected:	
 	FJudgeAnswerResult JudgeAnswer(TArray<int32>& PlayerAnswer);
-	
+	ABBPlayerController* GetCurrentTurnPlayer() const;
 protected:
+	UPROPERTY()
+	int CurrentTurnPlayerIndex;
+	
 	TArray<int32> TempPlayerAnswer;
 	TArray<int32> Answer;
 };

@@ -13,8 +13,7 @@ class NBC_CH4_1_BASEBALL_API UBBStateBase : public UState
 	
 public:
 	void SetOwnerGameMode(ABBGameMode* InOwnerGameMode);	
-	
-	virtual void PostLogin(AController* NewPlayer);
+	virtual void OnPostLogin(AController* NewPlayer);
 	virtual void OnPlayerMessageCommitted(const FString& InputString, AController* Sender);
 	
 protected:

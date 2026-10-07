@@ -28,7 +28,10 @@ public:
 	
 	void AddPlayerController(ABBPlayerController* NewPlayerController) ;
 	int32 GetPlayerControllerCount() const;
+	ABBPlayerController* GetPlayerControllerByIndex(int32 index) const;
 		
+	void ResetCurrentTurnPlayer();
+	void SetCurrentTurnPlayer(int32 index);
 protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "===Baseball===|Properties")
@@ -41,7 +44,7 @@ protected:
 	///////////////////////////////////////
 protected:
 	UPROPERTY()
-	ABBPlayerController* CurrentPlayer;
+	ABBPlayerController* CurrentTurnPlayer;
 
 	UPROPERTY()
 	TArray<ABBPlayerController*> PlayerControllers;
