@@ -20,5 +20,8 @@ public:
 	void MultiCast_AddChatMessage(const FString& NewMessage);
 	
 	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_ResetChatMessage();
+	
+	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_SetAnnounceMessage(const FString& NewAnnounceMessage);
 };

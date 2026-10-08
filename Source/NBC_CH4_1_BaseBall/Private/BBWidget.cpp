@@ -61,3 +61,10 @@ void UBBWidget::SetAnnounceText(const FString& NewAnnounceText)
 	
 	LastAnnounceTime = GetWorld()->GetTimeSeconds();
 }
+
+void UBBWidget::ResetChatHistory()
+{
+	JASSERT(IsValid(ChatHistory), "ChatHistory is not valid!");
+	
+	ChatHistory->SetText(FText::FromString(TEXT("")));
+}

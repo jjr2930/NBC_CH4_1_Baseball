@@ -4,6 +4,12 @@
 #include "BBPlayerState.h"
 #include "JUtility.h"
 
+UFinishedState::UFinishedState()
+{
+	StateDuration = 5.0f;
+	bIsFinished = false;
+}
+
 void UFinishedState::OnEnter()
 {
 	Super::OnEnter();

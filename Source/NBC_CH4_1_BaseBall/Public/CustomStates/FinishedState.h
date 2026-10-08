@@ -10,6 +10,8 @@ class NBC_CH4_1_BASEBALL_API UFinishedState : public UBBStateBase
 	GENERATED_BODY()
 	
 public:
+	UFinishedState();
+	
 	virtual void OnEnter() override;
 	virtual void OnTick(float DeltaSeconds) override;
 	

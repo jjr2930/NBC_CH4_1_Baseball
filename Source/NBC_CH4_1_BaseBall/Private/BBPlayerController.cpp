@@ -86,6 +86,18 @@ void ABBPlayerController::SetAnnounceMessage(const FString& NewAnnounceMessage)
 	IngameWidgetInstance->SetAnnounceText(NewAnnounceMessage);
 }
 
+void ABBPlayerController::ResetChatMessage()
+{
+	if (!bIsInit)
+	{
+		return;
+	}
+	
+	JASSERT(IsValid(IngameWidgetInstance), "IngameWidgetInstance is not valid!");
+	
+	IngameWidgetInstance->ResetChatHistory();
+}
+
 
 void ABBPlayerController::ServerRpcOnChatCommitted_Implementation(const FString& InputString)
 {

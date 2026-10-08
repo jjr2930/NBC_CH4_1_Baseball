@@ -45,6 +45,8 @@ public:
 	
 	void SetWinner(ABBPlayerController* NewWinner);
 	ABBPlayerController* GetWinner() const;
+	
+	void BroadCastResetChatMessage();
 protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "===Baseball===|Properties")

@@ -20,6 +20,7 @@ public:
 	
 	void AddChatHistory(const FString& NewMessage);
 	void SetAnnounceText(const FString& NewAnnounceText);
+	void ResetChatHistory();
 protected:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UEditableText> TextInput;

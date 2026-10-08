@@ -121,3 +121,11 @@ ABBPlayerController* ABBGameMode::GetWinner() const
 {
 	return Winner;
 }
+
+void ABBGameMode::BroadCastResetChatMessage()
+{
+	ABBGameState* BBGameState = GetWorld()->GetGameState<ABBGameState>();
+	JASSERT(IsValid(BBGameState), "BBGameState is not valid!");
+	
+	BBGameState->Multicast_ResetChatMessage();
+}

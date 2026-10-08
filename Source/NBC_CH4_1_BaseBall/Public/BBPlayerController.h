@@ -26,6 +26,7 @@ public:
 	
 	void AddPrintChattingMessage(const FString& Message);
 	void SetAnnounceMessage(const FString& NewAnnounceMessage);
+	void ResetChatMessage();
 protected:	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "===Baseball===|Properties");
 	TSubclassOf<UUserWidget> IngameWidgetClass;

@@ -84,7 +84,7 @@ bool UBBStateMachine::CheckIngameToFinishedTransition(UState* From, UState* To)
 
 bool UBBStateMachine::CheckFinishedToIngameTransition(UState* From, UState* To)
 {
-	UFinishedState* FinishedState = NewObject<UFinishedState>(this);
+	UFinishedState* FinishedState = Cast<UFinishedState>(From);
 	JASSERT_BOOL(IsValid(FinishedState), "FinishedState is not valid!");
 	
 	return FinishedState->IsFinished();

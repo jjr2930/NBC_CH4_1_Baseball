@@ -55,6 +55,18 @@ void UIngameState::OnEnter()
 		Answer.Add(RnadomNumber);
 	}
 	
+	//log answer
+	FString AnswerString;
+	for (int32 Num : Answer)
+	{
+		AnswerString += FString::FromInt(Num);
+	}
+	
+	JServerLog("UIngameState::OnEnter() Answer: %s", *AnswerString);
+	
+	OwnerGameMode->BroadcastAnnounceMessage(TEXT(""));
+	OwnerGameMode->BroadCastResetChatMessage();
+	
 	OwnerGameMode->ResetCurrentTurnPlayer();
 	OwnerGameMode->SetRunningState(ABBGameMode::ERunningState::Playing);
 }
@@ -160,9 +172,6 @@ void UIngameState::OnPlayerMessageCommitted(const FString& InputString, AControl
 			OwnerGameMode->BroadcastChatMessage(Message);
 		}
 		
-		CurrentTurnPlayerIndex = (CurrentTurnPlayerIndex + 1) % OwnerGameMode->GetPlayerControllerCount();
-		OwnerGameMode->SetCurrentTurnPlayer(CurrentTurnPlayerIndex);
-		
 		if (IsEveryPlayerUsedAllGuessCount())
 		{
 			OwnerGameMode->SetRunningState(ABBGameMode::ERunningState::Draw);
@@ -171,6 +180,11 @@ void UIngameState::OnPlayerMessageCommitted(const FString& InputString, AControl
 		
 			BBGameState->Multicast_SetAnnounceMessage(DrawMessage);
 		}
+		else
+		{
+			CurrentTurnPlayerIndex = (CurrentTurnPlayerIndex + 1) % OwnerGameMode->GetPlayerControllerCount();
+			OwnerGameMode->SetCurrentTurnPlayer(CurrentTurnPlayerIndex);
+		}		
 	}
 	else
 	{
