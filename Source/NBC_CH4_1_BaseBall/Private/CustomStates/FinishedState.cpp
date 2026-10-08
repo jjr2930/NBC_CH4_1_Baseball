@@ -41,6 +41,13 @@ void UFinishedState::OnEnter()
 			break;
 	}
 	
+	GetWorld()->GetTimerManager().SetTimer(
+		 TimerHandle
+		,this,
+		&UFinishedState::BroadcastReadyForNextGame
+		,StateDuration/2.f
+	);
+	
 	bIsFinished = false;
 }
 
@@ -53,6 +60,11 @@ void UFinishedState::OnTick(float DeltaSeconds)
 	{
 		bIsFinished = true;
 	}
+}
+
+void UFinishedState::BroadcastReadyForNextGame()
+{
+	OwnerGameMode->BroadcastAnnounceMessage(TEXT("System: Ready for the next game!"));
 }
 
 bool UFinishedState::IsFinished() const

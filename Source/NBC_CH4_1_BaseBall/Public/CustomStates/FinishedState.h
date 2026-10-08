@@ -15,6 +15,8 @@ public:
 	virtual void OnEnter() override;
 	virtual void OnTick(float DeltaSeconds) override;
 	
+	void BroadcastReadyForNextGame();
+	
 	bool IsFinished() const;
 protected:
 	UPROPERTY()
@@ -24,4 +26,5 @@ protected:
 	float StateDuration;
 	
 	bool bIsFinished;
+	FTimerHandle TimerHandle;
 };
