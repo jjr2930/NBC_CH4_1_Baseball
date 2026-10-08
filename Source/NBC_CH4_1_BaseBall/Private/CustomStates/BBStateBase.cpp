@@ -5,9 +5,25 @@
 #include "BBPlayerState.h"
 #include "Kismet/GameplayStatics.h"
 
+
+UBBStateBase::UBBStateBase()
+{
+	DisplayName = GetName();
+}
+
 void UBBStateBase::SetOwnerGameMode(ABBGameMode* InOwnerGameMode)
 {
 	OwnerGameMode = InOwnerGameMode;
+}
+
+void UBBStateBase::OnEnter()
+{
+	Super::OnEnter();
+
+	ABBGameMode* GameMode = Cast<ABBGameMode>(GetOuter()->GetOuter());
+	JASSERT(GameMode != nullptr, "GameMode is null");
+	
+	SetOwnerGameMode(GameMode);
 }
 
 void UBBStateBase::OnPostLogin(AController* NewPlayer)

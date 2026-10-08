@@ -29,10 +29,9 @@ public:
     void AddState(TObjectPtr<UState> InNewState);
     void AddTransition(TObjectPtr<UState> InFromState, FTransitionCheckingDelegate InDelegate, TObjectPtr<UState> InToState);
     
-    void SetOwner(AActor* InOwner);
-    AActor* GetOwner();
+
     template<CActor T>
-    T* GetOwner();
+    T* GetCastedOuter();
     
     UState* GetCurrentState();
     
@@ -43,28 +42,25 @@ protected:
     void ChangeState(TObjectPtr<UState> InNextState);
 
 protected:
-    UPROPERTY()
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Instanced, Category = "===StateMachine===|Properties")
     TArray<TObjectPtr<UState>> States;
     
-    UPROPERTY()
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Instanced, Category = "===StateMachine===|Properties")
     TArray<TObjectPtr<UTransition>> Transitions;
     
     TMultiMap<TObjectPtr<UState>, TObjectPtr<UTransition>> TransitionMap;
     
-    UPROPERTY()
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Instanced, Category = "===StateMachine===|Properties")
     TObjectPtr<UState> StartState;
     
-    UPROPERTY()
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "===StateMachine===|Properties")
     TObjectPtr<UState> CurrentState;
-    
-    UPROPERTY()
-    TObjectPtr<AActor> Owner;
 };
 
 template <CActor T>
-T* UStateMachine::GetOwner()
+T* UStateMachine::GetCastedOuter()
 {
-    return Cast<T>(Owner);
+    return Cast<T>(GetOuter());
 }
 
 template <CState T>

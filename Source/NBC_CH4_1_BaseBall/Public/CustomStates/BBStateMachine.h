@@ -12,9 +12,7 @@ class NBC_CH4_1_BASEBALL_API UBBStateMachine : public UStateMachine
 {
 	GENERATED_BODY()
 public:
-	static UBBStateMachine* Create(ABBGameMode* InOwnerGameMode);
-	
-	virtual void BuildStateTransitionMap() override;
+	UBBStateMachine();
 	
 	void OnPostLogin(AController* NewPlayer);
 	

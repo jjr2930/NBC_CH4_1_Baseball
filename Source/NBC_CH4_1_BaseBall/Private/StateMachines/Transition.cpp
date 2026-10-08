@@ -17,7 +17,7 @@ TObjectPtr<UTransition> UTransition::Create(
     );
 
     FName TransitionName(*TempName);
-    TObjectPtr<UTransition> NewTransition = NewObject<UTransition>(InOwner, TransitionName);
+    TObjectPtr<UTransition> NewTransition = InOwner->CreateDefaultSubobject<UTransition>(TransitionName);
 
     NewTransition->From = InFrom;
     NewTransition->To = InTo;

@@ -8,26 +8,21 @@
 #include "CustomStates/FinishedState.h"
 
 
-void UBBStateMachine::BuildStateTransitionMap()
-{	
-	UWaitPlayerState* WaitPlayerState = NewObject<UWaitPlayerState>(this);
+UBBStateMachine::UBBStateMachine()
+{
+	UWaitPlayerState* WaitPlayerState = CreateDefaultSubobject<UWaitPlayerState>(TEXT("WaitPlayerState"));
 	WaitPlayerState->SetParentMachine(this);	
-	WaitPlayerState->SetOwnerGameMode(GetOwner<ABBGameMode>());
-	WaitPlayerState->SetDisplayName(TEXT("WaitPlayerState"));
 	
-	UIngameState* IngameState = NewObject<UIngameState>(this);
+	UIngameState* IngameState = CreateDefaultSubobject<UIngameState>( TEXT("IngameState"));
 	IngameState->SetParentMachine(this);
-	IngameState->SetOwnerGameMode(GetOwner<ABBGameMode>());
-	IngameState->SetDisplayName(TEXT("IngameState"));
 	
-	UFinishedState* FinishedState = NewObject<UFinishedState>(this);
+	UFinishedState* FinishedState = CreateDefaultSubobject<UFinishedState>( TEXT("FinishedState"));
 	FinishedState->SetParentMachine(this);
-	FinishedState->SetOwnerGameMode(GetOwner<ABBGameMode>());
-	FinishedState->SetDisplayName(TEXT("FinishedState"));
 	
 	AddState(WaitPlayerState);
 	AddState(IngameState);
 	AddState(FinishedState);
+	
 	AddTransition(WaitPlayerState
 		, FTransitionCheckingDelegate::CreateUObject(this, &UBBStateMachine::CheckWaitToIngameTransition)
 		, IngameState);
@@ -51,13 +46,14 @@ void UBBStateMachine::BuildStateTransitionMap()
 
 bool UBBStateMachine::CheckWaitToIngameTransition(UState* From, UState* To)
 {
-	ABBGameMode* GameMode = GetOwner<ABBGameMode>();
-	if (GameMode->GetPlayerControllerCount() == GlobalConst::MAX_PLAYER_COUNT)
+	ABBGameMode* GameMode = GetCastedOuter<ABBGameMode>();
+	UWaitPlayerState* WaitPlayerState = Cast<UWaitPlayerState>(From);
+	JASSERT_BOOL(IsValid(GameMode), "GameMode is not valid!");
+	
+	bool bIsAllPlayerJoined = GameMode->GetPlayerControllerCount() == GlobalConst::MAX_PLAYER_COUNT;
+	bool bIsStateFinished = WaitPlayerState->IsFinished();
+	if (  bIsAllPlayerJoined && bIsStateFinished)
 	{
-		JServerLog("Entered player count == MAX_PLAYER_COUNT(%d), transition to IngameState."
-			, GlobalConst::MAX_PLAYER_COUNT);
-		
-		GameMode->BroadcastAnnounceMessage(TEXT("All players have joined. The game is starting!"));
 		return true;
 	}
 	else
@@ -68,7 +64,7 @@ bool UBBStateMachine::CheckWaitToIngameTransition(UState* From, UState* To)
 
 bool UBBStateMachine::CheckIngameToFinishedTransition(UState* From, UState* To)
 {
-	ABBGameMode* GameMode = GetOwner<ABBGameMode>();
+	ABBGameMode* GameMode = GetCastedOuter<ABBGameMode>();
 	JASSERT_BOOL(IsValid(GameMode), "GameMode is not valid!");
 	
 	if (GameMode->GetRunningState() != ABBGameMode::ERunningState::Playing)
@@ -96,13 +92,4 @@ void UBBStateMachine::OnPostLogin(AController* NewPlayer)
 	
 	UBBStateBase* CastedState = GetCurrentState<UBBStateBase>();
 	CastedState->OnPostLogin(NewPlayer);
-}
-
-UBBStateMachine* UBBStateMachine::Create(ABBGameMode* InOwnerGameMode)
-{
-	UBBStateMachine* NewStateMachine = NewObject<UBBStateMachine>(InOwnerGameMode, TEXT("BBStateMachine"));
-	NewStateMachine->SetOwner(InOwnerGameMode);
-	NewStateMachine->BuildStateTransitionMap();
-	
-	return NewStateMachine;
 }

@@ -36,9 +36,6 @@ public:
 	void AddPlayerController(ABBPlayerController* NewPlayerController) ;
 	int32 GetPlayerControllerCount() const;
 	ABBPlayerController* GetPlayerControllerByIndex(int32 index) const;
-		
-	void ResetCurrentTurnPlayer();
-	void SetCurrentTurnPlayer(int32 index);
 	
 	void SetRunningState(ERunningState newState);
 	ERunningState GetRunningState() const;
@@ -49,7 +46,7 @@ public:
 	void BroadCastResetChatMessage();
 protected:
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "===Baseball===|Properties")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "===BB GameMode===|Properties")
 	TArray<int32> Answer;
 	
 	TArray<int32> TempPlayerAnswer;
@@ -59,12 +56,9 @@ protected:
 	///////////////////////////////////////
 protected:
 	UPROPERTY()
-	ABBPlayerController* CurrentTurnPlayer;
-
-	UPROPERTY()
 	TArray<ABBPlayerController*> PlayerControllers;
 	
-	UPROPERTY()
+	UPROPERTY(Transient, VisibleAnywhere, BlueprintReadOnly, Instanced, Category = "===BB GameMode===|Properties")
 	TObjectPtr<UBBStateMachine> StateMachine;
 	
 	ERunningState GameState;

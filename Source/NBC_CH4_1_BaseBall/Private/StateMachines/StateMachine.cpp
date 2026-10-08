@@ -53,16 +53,6 @@ void UStateMachine::AddTransition(TObjectPtr< UState> InFromState, FTransitionCh
     Transitions.Emplace(NewTransition);
 }
 
-void UStateMachine::SetOwner(AActor* InOwner)
-{
-    Owner = InOwner;
-}
-
-AActor* UStateMachine::GetOwner()
-{
-    return Owner;
-}
-
 UState* UStateMachine::GetCurrentState()
 {
     return CurrentState;

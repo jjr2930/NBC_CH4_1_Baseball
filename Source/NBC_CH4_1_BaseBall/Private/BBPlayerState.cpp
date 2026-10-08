@@ -30,6 +30,11 @@ int ABBPlayerState::GetRemainGuessCount()
 	return RemainGuessCount;
 }
 
+void ABBPlayerState::ResetRemainGuessCount()
+{
+	RemainGuessCount = GlobalConst::TOTAL_GUESS_COUNT;
+}
+
 void ABBPlayerState::SetIngameName(const FString& NewName)
 {
 	this->IngameName= NewName;

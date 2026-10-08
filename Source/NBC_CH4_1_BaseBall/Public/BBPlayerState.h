@@ -21,6 +21,7 @@ public:
 	
 	void DecreaseRemainGuessCount();
 	int GetRemainGuessCount();
+	void ResetRemainGuessCount();
 	
 	void SetIngameName(const FString& NewName);
 	FString& GetPlayerName();

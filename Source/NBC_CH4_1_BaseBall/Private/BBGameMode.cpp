@@ -13,13 +13,21 @@
 ABBGameMode::ABBGameMode()
 {
 	PrimaryActorTick.bCanEverTick = true;
+	
+	StateMachine = CreateDefaultSubobject<UBBStateMachine>(TEXT("StateMachine"));
+	//StateMachine->SetOwner(this);
+	//StateMachine->BuildStateTransitionMap();
+	
+	// StateMachine = NewObject<UBBStateMachine>(this, "StateMachine");
+	// StateMachine->SetOwner(this);
+	// StateMachine->BuildStateTransitionMap();
 }
 
 void ABBGameMode::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
 {
 	Super::InitGame(MapName, Options, ErrorMessage);
 	
-	StateMachine = UBBStateMachine::Create(this);
+	ABBGameMode* DefaultObject = ABBGameMode::GetClass()->GetDefaultObject<ABBGameMode>();
 	StateMachine->OnEnter();
 }
 
@@ -83,23 +91,6 @@ ABBPlayerController* ABBGameMode::GetPlayerControllerByIndex(int32 index) const
 	JASSERT_NULLPTR ((0 <= index) && (index < PlayerControllers.Num()), "Index is out of range!");
 	
 	return PlayerControllers[index];
-}
-
-void ABBGameMode::ResetCurrentTurnPlayer()
-{
-	JASSERT(PlayerControllers.Num() > 0, "PlayerControllers is empty!");
-	
-	SetCurrentTurnPlayer(0);
-}
-
-void ABBGameMode::SetCurrentTurnPlayer(int32 index)
-{
-	JASSERT((0 <= index) && (index < PlayerControllers.Num()), "Index is out of range!");
-	
-	CurrentTurnPlayer = PlayerControllers[index];
-	
-	FString Message = TEXT("It's your turn to play!");
-	CurrentTurnPlayer->ClientRpcSetAnnounceMessage(Message);
 }
 
 void ABBGameMode::SetRunningState(ERunningState newState)

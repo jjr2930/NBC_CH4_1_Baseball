@@ -15,6 +15,10 @@ void UWaitPlayerState::OnEnter()
 	Super::OnEnter();
 	
 	JServerLog("UWaitPlayerState::OnEnter");
+	
+	bIsFinished = false;
+	
+	BroadcastReadyForNextGameIfNeed();
 }
 
 void UWaitPlayerState::OnPostLogin(AController* NewPlayer)
@@ -36,6 +40,8 @@ void UWaitPlayerState::OnPostLogin(AController* NewPlayer)
 		, *BBPlayerController->GetPlayerState<ABBPlayerState>()->GetPlayerName());
 		
 	OwnerGameMode->BroadcastAnnounceMessage(Message);
+	
+	BroadcastReadyForNextGameIfNeed();
 }
 
 void UWaitPlayerState::OnPlayerMessageCommitted(const FString& InputString, AController* Sender)
@@ -43,7 +49,27 @@ void UWaitPlayerState::OnPlayerMessageCommitted(const FString& InputString, ACon
 	Super::OnPlayerMessageCommitted(InputString, Sender);
 }
 
-bool UWaitPlayerState::IsPlayerQueueEmpty() const
+void UWaitPlayerState::SetFinish()
 {
-	return NewPlayerQueue.IsEmpty();
+	bIsFinished = true;
+}
+
+bool UWaitPlayerState::IsFinished() const
+{
+	return bIsFinished;
+}
+
+void UWaitPlayerState::BroadcastReadyForNextGameIfNeed()
+{
+	if (OwnerGameMode->GetPlayerControllerCount() == GlobalConst::MAX_PLAYER_COUNT)
+	{
+		OwnerGameMode->BroadcastAnnounceMessage(TEXT("Ready for the next game!"));
+		
+		OwnerGameMode->GetWorld()->GetTimerManager().SetTimer(
+			 TimerHandle
+			,this,
+			&UWaitPlayerState::SetFinish
+			,ReadyWaitingTime
+		);
+	}
 }

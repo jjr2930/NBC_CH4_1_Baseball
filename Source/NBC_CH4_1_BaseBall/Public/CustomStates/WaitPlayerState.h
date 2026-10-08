@@ -16,7 +16,15 @@ public:
 	virtual void OnPostLogin(AController* NewPlayer) override;
 	virtual void OnPlayerMessageCommitted(const FString& InputString, AController* Sender) override;
 	
-	bool IsPlayerQueueEmpty() const;
+	void SetFinish();
+	bool IsFinished() const;
+	
+	void BroadcastReadyForNextGameIfNeed();
 protected:
-	TQueue<TObjectPtr<ABBPlayerController>> NewPlayerQueue;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "===WaitPlayerState===|Properties")
+	float ReadyWaitingTime = 2.5f;
+	
+	FTimerHandle TimerHandle;
+	bool bIsFinished;
 };

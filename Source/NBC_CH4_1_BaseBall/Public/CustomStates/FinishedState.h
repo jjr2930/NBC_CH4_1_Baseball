@@ -19,12 +19,10 @@ public:
 	
 	bool IsFinished() const;
 protected:
-	UPROPERTY()
-	float StartTime;
-	
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "===BB State===|Properties")
 	float StateDuration;
 	
+	float StartTime;
 	bool bIsFinished;
 	FTimerHandle TimerHandle;
 };

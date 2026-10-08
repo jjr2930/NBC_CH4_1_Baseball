@@ -12,7 +12,11 @@ class NBC_CH4_1_BASEBALL_API UBBStateBase : public UState
 	GENERATED_BODY()
 	
 public:
+	UBBStateBase();
+	void SetDisplayNameFromObjectName();
 	void SetOwnerGameMode(ABBGameMode* InOwnerGameMode);	
+	
+	virtual void OnEnter() override;
 	virtual void OnPostLogin(AController* NewPlayer);
 	virtual void OnPlayerMessageCommitted(const FString& InputString, AController* Sender);
 	
@@ -21,6 +25,6 @@ protected:
 	void SendAnnounceMessage(const FString& NewAnnounceMessage);
 	
 protected:
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "===BBStateBase===|Properties")
 	TObjectPtr<ABBGameMode> OwnerGameMode;
 };

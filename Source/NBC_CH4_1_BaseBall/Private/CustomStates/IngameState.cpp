@@ -64,11 +64,7 @@ void UIngameState::OnEnter()
 	
 	JServerLog("UIngameState::OnEnter() Answer: %s", *AnswerString);
 	
-	OwnerGameMode->BroadcastAnnounceMessage(TEXT(""));
-	OwnerGameMode->BroadCastResetChatMessage();
-	
-	OwnerGameMode->ResetCurrentTurnPlayer();
-	OwnerGameMode->SetRunningState(ABBGameMode::ERunningState::Playing);
+	ResetGame();
 }
 
 void UIngameState::OnPlayerMessageCommitted(const FString& InputString, AController* Sender)
@@ -180,10 +176,10 @@ void UIngameState::OnPlayerMessageCommitted(const FString& InputString, AControl
 		
 			BBGameState->Multicast_SetAnnounceMessage(DrawMessage);
 		}
-		else
-		{
+		else // if the game is not finished, move to next turn player
+		{	
 			CurrentTurnPlayerIndex = (CurrentTurnPlayerIndex + 1) % OwnerGameMode->GetPlayerControllerCount();
-			OwnerGameMode->SetCurrentTurnPlayer(CurrentTurnPlayerIndex);
+			OwnerGameMode->GetPlayerControllerByIndex(CurrentTurnPlayerIndex);
 		}		
 	}
 	else
@@ -201,6 +197,25 @@ void UIngameState::OnPlayerMessageCommitted(const FString& InputString, AControl
 	}	
 }
 
+void UIngameState::ResetGame()
+{
+	OwnerGameMode->BroadcastAnnounceMessage(TEXT(""));
+	OwnerGameMode->BroadCastResetChatMessage();
+	OwnerGameMode->SetRunningState(ABBGameMode::ERunningState::Playing);
+	
+	int PlayerControllerCount = OwnerGameMode->GetPlayerControllerCount();
+	for (int32 i = 0; i < PlayerControllerCount; i++)
+	{
+		ABBPlayerController* PlayerController = OwnerGameMode->GetPlayerControllerByIndex(i);
+		JASSERT(IsValid(PlayerController), "PlayerController is not valid!");
+		
+		ABBPlayerState* PlayerState = PlayerController->GetPlayerState<ABBPlayerState>();
+		JASSERT(IsValid(PlayerState), "PlayerState is not valid!");
+
+		PlayerState->ResetRemainGuessCount();
+	}
+}
+
 bool UIngameState::IsEveryPlayerUsedAllGuessCount() const
 {
 	int32 ControllerCounut = OwnerGameMode->GetPlayerControllerCount();
@@ -213,6 +228,21 @@ bool UIngameState::IsEveryPlayerUsedAllGuessCount() const
 		}
 	}
 	return true;
+}
+
+ABBPlayerController* UIngameState::GetCurrentTurnPlayer() const
+{
+	return OwnerGameMode->GetPlayerControllerByIndex(CurrentTurnPlayerIndex);
+}
+
+void UIngameState::SetCurrentTurnPlayerToNextPlayer()
+{
+	CurrentTurnPlayerIndex = (CurrentTurnPlayerIndex + 1) % OwnerGameMode->GetPlayerControllerCount();
+}
+
+void UIngameState::ResetCurrentTurnPlayer()
+{
+	CurrentTurnPlayerIndex = 0;
 }
 
 FJudgeAnswerResult UIngameState::JudgeAnswer(TArray<int32>& PlayerAnswer)
@@ -232,9 +262,4 @@ FJudgeAnswerResult UIngameState::JudgeAnswer(TArray<int32>& PlayerAnswer)
 	}	
 
 	return Result;
-}
-
-ABBPlayerController* UIngameState::GetCurrentTurnPlayer() const
-{
-	return OwnerGameMode->GetPlayerControllerByIndex(CurrentTurnPlayerIndex);
 }
